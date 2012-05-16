@@ -1,0 +1,2 @@
+./0000_example.jpg
+./0001_example.jpg
