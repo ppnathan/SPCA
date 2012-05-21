@@ -1,7 +1,6 @@
 close all; clear all;
 
 load raw_features.mat;
-addpath('SPCA_ALM');
 addpath('GPower');
 
 BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans'; 'foothill'; 'garden'; ...
