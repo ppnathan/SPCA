@@ -1,4 +1,4 @@
-function [result_labels class_acc overall_acc] = NN_1(test_hist, train_hist, distance_type)
+function [result_labels class_acc overall_acc] = NN_1(test_hist, train_hist, ground_truth, distance_type)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -18,6 +18,7 @@ addpath('EmdL1_v3');
 
 [feat_dim num_imgs_per_obj num_objects ]= size(test_hist);
 
+% normalize the vectors
 if (strcmp(distance_type, 'l1') || strcmp(distance_type,'int'))
     norm_test_hist = sum(abs(test_hist), 1);%sqrt(sum(test_hist.^2, 1));
     for i =1:feat_dim
@@ -60,8 +61,8 @@ for i = 1:num_objects
     end
 end
 
-ground_truth(1, 1, :) = 1:1:num_objects;
-ground_truth = repmat(ground_truth, [1 num_imgs_per_obj]);
+% ground_truth(1, 1, :) = 1:1:num_objects;
+% ground_truth = repmat(ground_truth, [1 num_imgs_per_obj]);
 
 error = result_labels - ground_truth;
 class_acc = sum(abs(error)==0, 2)./num_imgs_per_obj;

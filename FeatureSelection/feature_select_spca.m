@@ -35,8 +35,10 @@ for i = 1:length(BMW_objects)
 %     y = x.*(abs(x)>1e-3);
 
 %     two eigenvectors
-    x = GPower(histogram_new', rho.^2, num_pc, 'l0', 0);
-    y = sum(abs(x)>1e-3, 2);
+%     x = GPower(histogram_new', rho.^2, num_pc, 'l0', 0);
+    x = GPower(histogram_new', rho, num_pc, 'l1', 0);
+%     check_orthogonal(i) = x(:, 1)'*x(:, 2);
+    y = (sum(abs(x)>1e-3, 2)>0);
 
 %     one eigenvector block
 %     mu = [1:num_pc].^(-1);

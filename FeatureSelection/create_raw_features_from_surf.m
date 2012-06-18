@@ -1,15 +1,14 @@
 close all; clear all;
 
-% load SPCA_rank_2.mat;
 
 BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans'; 'foothill'; 'garden'; ...
      'haas'; 'hearstgym'; 'hertzmorrison'; 'hilgard'; 'hmc'; 'logcabin'; 'mainlibrary'; 'musiclibrary'; ...
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 % [locs, desc, surfFeatures] = ParseSURFFile('BMW', 'BMW_SURF', BMW_objects{3}, '01', '0000');
 
-%% collect features from all the landmarks
+%% collect features from all the training landmarks
 train_camera_id = '02';
-train_images_id = {'0000'; '0002';'0004';'0006';'0008';'0010';'0012';'0014';};
+train_images_id = {'0000'; '0002'; '0004'; '0006'; '0008'; '0010'; '0012'; '0014'};
 data_dir = '../../opencv/BMW';
 train_surf = [];
 train_locs = [];
