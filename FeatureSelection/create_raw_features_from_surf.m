@@ -26,14 +26,23 @@ for i = 1:num_objects
     end
 end
 
+% train_surf is an Nx128 matrix, where N is the total number of SURF
+% features across all classes/training instances.
+
 
 %% create a hierachical k-mean tree
 
 K = 10;
 nleaves = 1000;
 % uint8_surf = uint8(train_surf'*255);
+% input to vl_hikmeans is 128xN, where N is the total number of SURF
+% features.
+keyboard;
 [train_tree, A] = vl_hikmeans(uint8(train_surf'*255), K, nleaves, 'method', 'elkan') ;
 train_labels = (A(1, :)-1)*(K^2) + (A(2, :)-1)*K + A(3, :);
+
+% train_labels is a 1xN vector, where N is the total number of SURF
+% features. train_labels(i) := which leaf node SURF vector i lands on.
 
 % [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{1}, train_camera_id, train_images_id{1});
 % AT  = vl_hikmeanspush(train_tree, uint8(desc(1, :)'*255)) ;
