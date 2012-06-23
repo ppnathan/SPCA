@@ -17,7 +17,7 @@ num_img_each_object = length(train_images_id);
 
 for i = 1:num_objects
     for j = 1:num_img_each_object
-        [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, train_camera_id, train_images_id{j}, 1);
+        [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, train_camera_id, train_images_id{j}, 0);
         num_features(i, j) = size(locs, 1);
         train_surf = [train_surf; desc];
         train_locs = [train_locs; [i*ones(num_features(i, j), 1)  j*ones(num_features(i, j), 1) locs]];
@@ -32,13 +32,15 @@ end
 %% create a hierachical k-mean tree
 
 K = 10;
-nleaves = 1000;
+%nleaves = 1000;
+nleaves = 10000;       % 10,000 D
 % uint8_surf = uint8(train_surf'*255);
 % input to vl_hikmeans is 128xN, where N is the total number of SURF
 % features.
-keyboard;
+
 [train_tree, A] = vl_hikmeans(uint8(train_surf'*255), K, nleaves, 'method', 'elkan') ;
-train_labels = (A(1, :)-1)*(K^2) + (A(2, :)-1)*K + A(3, :);
+%train_labels = (A(1, :)-1)*(K^2) + (A(2, :)-1)*K + A(3, :);
+train_labels = (A(1, :)-1)*(K^3) + (A(2, :)-1)*K^2 + (A(3, :)-1)*K + A(4, :);
 
 % train_labels is a 1xN vector, where N is the total number of SURF
 % features. train_labels(i) := which leaf node SURF vector i lands on.
@@ -49,7 +51,8 @@ train_labels = (A(1, :)-1)*(K^2) + (A(2, :)-1)*K + A(3, :);
 %% create histogram
 
 
-bins = 1:1:1000;
+%bins = 1:1:1000;
+bins = 1:1:10000;       % 10,000 D
 start = 1;
 for i = 1:num_objects;
     for j = 1:num_img_each_object

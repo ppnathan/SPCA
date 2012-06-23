@@ -21,29 +21,35 @@ load test_histogram;
 %     cnt_img = 1;
 %     for j = 1:num_test_cameras
 %         for k = 1:num_test_images_per_camera
-%              [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, test_cameras_id{j}, test_images_id{k}, 1);
+%              [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, test_cameras_id{j}, test_images_id{k}, 0);
 %              feat_cata = zeros(size(locs, 1), 1);
 %              for p = 1:size(locs, 1)
 %                  AT = vl_hikmeanspush(train_tree, uint8(desc(p, :)'*255));
-%                  feat_cata(p) = (AT(1)-1)*100 + (AT(2)-1)*10 + AT(3);
+%                  % 10,000 D
+%                  feat_cata(p) = (AT(1)-1)*1000 + (AT(2)-1)*100 + AT(3)*10 + AT(4);
+%                  %feat_cata(p) = (AT(1)-1)*100 + (AT(2)-1)*10 + AT(3);
 %              end
-%              bins = 1:1:1000;
+%              bins = 1:1:10000;       % 10,000 D
+%              %bins = 1:1:1000;
 %              test_histogram(:, cnt_img, i) = histc(feat_cata, bins)';
+%              disp(sprintf('i = %d / %d, j = %d / %d, k = %d / %d', i, num_test_objects, j, num_test_cameras, k, num_test_images_per_camera))
 %              cnt_img = cnt_img+1;
 %         end
 %     end
 % end
-% 
-% test_histogram = test_histogram.*repmat(tdf, [1 size(test_histogram, 2) size(test_histogram, 3)]);
-% save test_histogram.mat test_histogram;
 
+%test_histogram = test_histogram.*repmat(tdf, [1 size(test_histogram, 2) size(test_histogram, 3)]);
+%save test_histogram.mat test_histogram;
+
+% test_histogram is an D x N x C, where D := dimension of histogram
+% (i.e. 1000, 10000), N := test image instance, C := Object Class
 
 ground_truth(1, 1, :) = 1:1:num_test_objects;
 ground_truth = repmat(ground_truth, [1 num_test_images_per_camera*num_test_cameras]);
 
 tic;
 % [result_labels_bl class_acc_bl overall_acc_bl] = NN_1(test_histogram, train_histogram, ground_truth, 'l1');
-[result_labels_bl class_acc_bl overall_acc_bl] = NS(test_histogram, train_histogram, ground_truth);
+[result_labels_bl class_acc_bl overall_acc_bl] = NS(test_histogram, train_histogram, ground_truth); % CRASHED HERE
 time1 = toc;
 
 %% testing with infomative features
