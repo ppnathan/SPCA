@@ -19,7 +19,7 @@ HIST_DIM = 1000;
 
 load test_histogram;
 %% testing with baseline method (with all features)
-% test_histogram = zeros(HIST_DIM, num_test_images_per_camera*num_test_cameras, num_test_objects, 'int8');
+% test_histogram = zeros(HIST_DIM, num_test_images_per_camera*num_test_cameras, num_test_objects);
 % for i =1:num_test_objects
 %     cnt_img = 1;
 %     for j = 1:num_test_cameras
@@ -56,11 +56,12 @@ ground_truth(1, 1, :) = 1:1:num_test_objects;
 ground_truth = repmat(ground_truth, [1 num_test_images_per_camera*num_test_cameras]);
 
 tic;
-%[result_labels_bl class_acc_bl overall_acc_bl] = NN_1(test_histogram, train_histogram, ground_truth, 'l1');
-[result_labels_bl class_acc_bl overall_acc_bl] = NS(test_histogram, train_histogram, ground_truth); % CRASHED HERE
+disp('== Testing baseline...');
+[result_labels_bl class_acc_bl overall_acc_bl] = NN_1(test_histogram, train_histogram, ground_truth, 'l1');
+%[result_labels_bl class_acc_bl overall_acc_bl] = NS(test_histogram, train_histogram, ground_truth); % CRASHED HERE
 fprintf('Baseline Overall Accuracy: %f\n', overall_acc_bl);
 time1 = toc;
-
+disp('');
 %% testing with infomative features
 support_id = find(total_support ==1);
 
@@ -68,7 +69,8 @@ test_histogram_sp = test_histogram(support_id, :, :);
 train_histogram_sp = train_histogram(support_id, :, :);
 % support_sp = support(support_id, :);
 tic;
-%[result_labels_spca class_acc_spca overall_acc_spca] = NN_1(test_histogram_sp, train_histogram_sp, ground_truth, 'l1');
-[result_labels_spca class_acc_spca overall_acc_spca] = NS(test_histogram_sp, train_histogram_sp, ground_truth);
+disp('== Testing SPCA...');
+[result_labels_spca class_acc_spca overall_acc_spca] = NN_1(test_histogram_sp, train_histogram_sp, ground_truth, 'l1');
+%[result_labels_spca class_acc_spca overall_acc_spca] = NS(test_histogram_sp, train_histogram_sp, ground_truth);
 fprintf('SPCA Overall Accuracy: %f\n', overall_acc_spca);
 time2 = toc;

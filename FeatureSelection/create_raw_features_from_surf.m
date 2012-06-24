@@ -59,7 +59,7 @@ end
 
 bins = 1:1:HIST_DIM;
 start = 1;
-train_histogram = zeros(HIST_DIM, num_img_each_object, num_objects, 'int8');
+train_histogram = zeros(HIST_DIM, num_img_each_object, num_objects);
 for i = 1:num_objects;
     for j = 1:num_img_each_object
         train_histogram(:, j, i) = histc(train_labels(1, start:start+num_features(i, j)-1), bins)';
