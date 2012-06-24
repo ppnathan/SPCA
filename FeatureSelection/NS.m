@@ -27,6 +27,8 @@ function [result_labels class_acc overall_acc] = NS_me(test_hist, train_hist, gr
 % train_hist = train_hist - repmat(mean(train_hist, 2), 1, size(train_hist, 2));
 % test_hist = test_hist - repmat(mean(test_hist, 2), 1, size(test_hist, 2));
 
+%% Compute Orthonormal Basis for each subspace
+disp('Computing basis for each subspace...');
 subspaces = cell(1, num_objects);
 
 result_labels = zeros(1, num_imgs_per_obj, num_objects);
@@ -41,7 +43,8 @@ end
 % subspaces is a cell vector that stores the orthnonormal basis vectors for
 % each class C. A vector of size 1xC, subspaces{1,i} returns a matrix where
 % each col is an orthonormal basis vector.
-
+%% For each histogram, find its nearest subspace
+disp('Finding nearest subspace for each test image...');
 for i = 1:num_objects
     dist_subspace = zeros(num_objects, num_imgs_per_obj);
     cur_hist = test_hist(:,:,i);
@@ -71,6 +74,7 @@ for i = 1:num_objects
 
 end
 
+%% Compute Accuracies
 error = result_labels - ground_truth;
 class_acc = sum(abs(error)==0, 2)./num_imgs_per_obj;
 overall_acc = sum(sum(abs(error)==0))./(num_imgs_per_obj*num_objects);
