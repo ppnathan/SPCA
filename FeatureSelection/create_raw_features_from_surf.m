@@ -6,6 +6,8 @@ BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans';
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 % [locs, desc, surfFeatures] = ParseSURFFile('BMW', 'BMW_SURF', BMW_objects{3}, '01', '0000');
 
+HIST_DIM = 1000;
+
 %% collect features from all the training landmarks
 train_camera_id = '02';
 train_images_id = {'0000'; '0002'; '0004'; '0006'; '0008'; '0010'; '0012'; '0014'};
@@ -32,16 +34,20 @@ end
 %% create a hierachical k-mean tree
 
 K = 10;
-%nleaves = 1000;
-nleaves = 10000;       % 10,000 D
+nleaves = HIST_DIM;
 % uint8_surf = uint8(train_surf'*255);
 % input to vl_hikmeans is 128xN, where N is the total number of SURF
 % features.
 
 [train_tree, A] = vl_hikmeans(uint8(train_surf'*255), K, nleaves, 'method', 'elkan') ;
-%train_labels = (A(1, :)-1)*(K^2) + (A(2, :)-1)*K + A(3, :);
-train_labels = (A(1, :)-1)*(K^3) + (A(2, :)-1)*K^2 + (A(3, :)-1)*K + A(4, :);
-
+if HIST_DIM == 1000
+    train_labels = (A(1, :)-1)*(K^2) + (A(2, :)-1)*K + A(3, :);
+elseif HIST_DIM == 10000
+    train_labels = (A(1, :)-1)*(K^3) + (A(2, :)-1)*K^2 + (A(3, :)-1)*K + A(4, :);
+else
+    fprintf('Error, unsupported HIST_DIM: %d\n', HIST_DIM);
+    return
+end
 % train_labels is a 1xN vector, where N is the total number of SURF
 % features. train_labels(i) := which leaf node SURF vector i lands on.
 
@@ -51,9 +57,9 @@ train_labels = (A(1, :)-1)*(K^3) + (A(2, :)-1)*K^2 + (A(3, :)-1)*K + A(4, :);
 %% create histogram
 
 
-%bins = 1:1:1000;
-bins = 1:1:10000;       % 10,000 D
+bins = 1:1:HIST_DIM;
 start = 1;
+train_histogram = zeros(HIST_DIM, num_img_each_object, num_objects, 'int8');
 for i = 1:num_objects;
     for j = 1:num_img_each_object
         train_histogram(:, j, i) = histc(train_labels(1, start:start+num_features(i, j)-1), bins)';

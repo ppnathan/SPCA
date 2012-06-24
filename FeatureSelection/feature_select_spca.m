@@ -7,12 +7,20 @@ BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans';
      'haas'; 'hearstgym'; 'hertzmorrison'; 'hilgard'; 'hmc'; 'logcabin'; 'mainlibrary'; 'musiclibrary'; ...
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 
+HIST_DIM = 1000;
 
 %% run SPCA
 num_pc = 2;
 rho = 0.3*ones(1, num_pc);
-%support = zeros(1000, length(BMW_objects));
-support = zeros(10000, length(BMW_objects));       % 10,000 D
+if HIST_DIM == 1000
+    support = zeros(1000, length(BMW_objects));
+elseif HIST_DIM == 10000
+    support = zeros(10000, length(BMW_objects));
+else
+    fprintf('Error: unsupported HIST_DIM: %d\n', HIST_DIM);
+    return
+end
+    
 for i = 1:length(BMW_objects)
     i
     feat_cov(:, :) = cov(train_histogram(:, :, i)');
@@ -20,8 +28,7 @@ for i = 1:length(BMW_objects)
 % SAFE variable elimination for SPCA
     %remain_id = find(diag(feat_cov(:, :)) > rho)';
 %     feat_cov_new = feat_cov(remain_id, remain_id, i);
-    remain_id = 1:1:10000;       % 10,000 D
-    %remain_id = 1:1:1000;
+    remain_id = 1:1:HIST_DIM;
     histogram_new = train_histogram(remain_id, :, i);
     norm_hist_new = sqrt(sum(histogram_new.^2, 1));
     hist_new_dim = size(histogram_new, 1);
@@ -76,8 +83,8 @@ imshow(im); hold on;
 for i =1:size(desc, 1);
     hi_labels = vl_hikmeanspush(train_tree, uint8(desc(i, :)'*255));
     % 10,000 D
-    numerical_labels = (hi_labels(1)-1)*1000 +(hi_labels(2)-1)*100+(hi_labels(3)-1)*10+hi_labels(4);
-    %numerical_labels = (hi_labels(1)-1)*100+(hi_labels(2)-1)*10+hi_labels(3);
+    %numerical_labels = (hi_labels(1)-1)*1000 +(hi_labels(2)-1)*100+(hi_labels(3)-1)*10+hi_labels(4);
+    numerical_labels = (hi_labels(1)-1)*100+(hi_labels(2)-1)*10+hi_labels(3);
     if (total_support(numerical_labels) > 0)
         plot(locs(i,1), locs(i,2), 'rx', 'markersize', 12);
     end
