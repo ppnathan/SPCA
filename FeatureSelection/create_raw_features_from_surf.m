@@ -6,7 +6,7 @@ BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans';
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 % [locs, desc, surfFeatures] = ParseSURFFile('BMW', 'BMW_SURF', BMW_objects{3}, '01', '0000');
 
-HIST_DIM = 1000;
+HIST_DIM = 10000;
 
 %% collect features from all the training landmarks
 train_camera_id = '02';
@@ -16,11 +16,15 @@ train_surf = [];
 train_locs = [];
 num_objects = length(BMW_objects);
 num_img_each_object = length(train_images_id);
-
+num_features = zeros(num_objects, num_img_each_object);
+%SURF_DIM = 128;
+%train_surf = zeros(100, SURF_DIM);
 for i = 1:num_objects
     for j = 1:num_img_each_object
+        fprintf('i=%d/%d j=%d/%d\n', i, num_objects, j, num_img_each_object);
         [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, train_camera_id, train_images_id{j}, 0);
         num_features(i, j) = size(locs, 1);
+        %disp(size(desc));
         train_surf = [train_surf; desc];
         train_locs = [train_locs; [i*ones(num_features(i, j), 1)  j*ones(num_features(i, j), 1) locs]];
         

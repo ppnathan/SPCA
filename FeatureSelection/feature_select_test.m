@@ -15,39 +15,50 @@ num_test_cameras = length(test_cameras_id);
 num_test_images_per_camera = length(test_images_id);
 num_total_test_images = num_test_objects*num_test_cameras*num_test_images_per_camera;
 
-HIST_DIM = 1000;
+HIST_DIM = 10000;
 
-load test_histogram;
+skip_processtest = 0;
+if exist('test_histogram.mat', 'file')
+    fprintf('%s was detected, skipping generation of test image histograms.\n', 'test_histogram.mat');
+    skip_processtest = 1;
+    load('test_histogram.mat');
+end
 %% testing with baseline method (with all features)
-% test_histogram = zeros(HIST_DIM, num_test_images_per_camera*num_test_cameras, num_test_objects);
-% for i =1:num_test_objects
-%     cnt_img = 1;
-%     for j = 1:num_test_cameras
-%         for k = 1:num_test_images_per_camera
-%              [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, test_cameras_id{j}, test_images_id{k}, 0);
-%              feat_cata = zeros(size(locs, 1), 1);
-%              for p = 1:size(locs, 1)
-%                  AT = vl_hikmeanspush(train_tree, uint8(desc(p, :)'*255));
-%                  if HIST_DIM == 1000
-%                      feat_cata(p) = (AT(1)-1)*100 + (AT(2)-1)*10 + AT(3);
-%                  elseif HIST_DIM == 10000
-%                      feat_cata(p) = (AT(1)-1)*1000 + (AT(2)-1)*100 + AT(3)*10 + AT(4);   
-%                  else
-%                      fprintf('Error: Unsupported HIST_DIM: %d\n', HIST_DIM);
-%                      return
-%                  end
-%                  
-%              end
-%              bins = 1:1:HIST_DIM;
-%              test_histogram(:, cnt_img, i) = histc(feat_cata, bins)';
-%              fprintf('i = %d / %d, j = %d / %d, k = %d / %d\n', i, num_test_objects, j, num_test_cameras, k, num_test_images_per_camera)
-%              cnt_img = cnt_img+1;
-%         end
-%     end
-% end
-% 
-% test_histogram = test_histogram.*repmat(tdf, [1 size(test_histogram, 2) size(test_histogram, 3)]);
-% save test_histogram.mat test_histogram;
+if ~skip_processtest
+    disp('Processing test image histograms');
+    test_histogram = zeros(HIST_DIM, num_test_images_per_camera*num_test_cameras, num_test_objects);
+    for i =1:num_test_objects
+        cnt_img = 1;
+        for j = 1:num_test_cameras
+            for k = 1:num_test_images_per_camera
+                 [locs, desc, surfFeatures] = ParseSURFFile(data_dir, data_dir, BMW_objects{i}, test_cameras_id{j}, test_images_id{k}, 0);
+
+                 desc = uint8(desc*255)';
+                 feat_cata = zeros(size(locs, 1), 1);
+                 for p = 1:size(locs, 1)
+                     %AT = vl_hikmeanspush(train_tree, uint8(desc(p, :)'*255));
+                     AT = vl_hikmeanspush(train_tree, desc(:,p));
+                     if HIST_DIM == 1000
+                         feat_cata(p) = (AT(1)-1)*100 + (AT(2)-1)*10 + AT(3);
+                     elseif HIST_DIM == 10000
+                         feat_cata(p) = (AT(1)-1)*1000 + (AT(2)-1)*100 + (AT(3)-1)*10 + AT(4);   
+                     else
+                         fprintf('Error: Unsupported HIST_DIM: %d\n', HIST_DIM);
+                         return
+                     end
+
+                 end
+                 bins = 1:1:HIST_DIM;
+                 test_histogram(:, cnt_img, i) = histc(feat_cata, bins)';
+                 fprintf('i = %d / %d, j = %d / %d, k = %d / %d\n', i, num_test_objects, j, num_test_cameras, k, num_test_images_per_camera)
+                 cnt_img = cnt_img+1;
+            end
+        end
+    end
+end
+
+test_histogram = test_histogram.*repmat(tdf, [1 size(test_histogram, 2) size(test_histogram, 3)]);
+save test_histogram.mat test_histogram;
 
 % test_histogram is an D x N x C, where D := dimension of histogram
 % (i.e. 1000, 10000), N := test image instance, C := Object Class

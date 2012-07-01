@@ -7,7 +7,7 @@ BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans';
      'haas'; 'hearstgym'; 'hertzmorrison'; 'hilgard'; 'hmc'; 'logcabin'; 'mainlibrary'; 'musiclibrary'; ...
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 
-HIST_DIM = 1000;
+HIST_DIM = 10000;
 
 %% run SPCA
 num_pc = 2;
@@ -23,15 +23,18 @@ end
     
 for i = 1:length(BMW_objects)
     i
-    feat_cov(:, :) = cov(train_histogram(:, :, i)');
+    feat_cov = cov(train_histogram(:, :, i)');
     
 % SAFE variable elimination for SPCA
-    %remain_id = find(diag(feat_cov(:, :)) > rho)';
-%     feat_cov_new = feat_cov(remain_id, remain_id, i);
-    remain_id = 1:1:HIST_DIM;
+    % assume elements in rho[] are the same.
+    remain_id = find(diag(feat_cov(:, :)) > rho(1))'; 
+    feat_cov = feat_cov(remain_id, remain_id);
+    %remain_id = 1:1:HIST_DIM; % If we ignore SAFE variable elimination
     histogram_new = train_histogram(remain_id, :, i);
+    
     norm_hist_new = sqrt(sum(histogram_new.^2, 1));
     hist_new_dim = size(histogram_new, 1);
+    % Make histograms unit-vectors, centered at 0
     for k = 1:hist_new_dim
         histogram_new(k, :) = histogram_new(k, :)./norm_hist_new;
     end
