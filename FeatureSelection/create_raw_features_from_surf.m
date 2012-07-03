@@ -6,7 +6,7 @@ BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans';
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 % [locs, desc, surfFeatures] = ParseSURFFile('BMW', 'BMW_SURF', BMW_objects{3}, '01', '0000');
 
-HIST_DIM = 10000;
+HIST_DIM = 1000;
 
 %% collect features from all the training landmarks
 train_camera_id = '02';

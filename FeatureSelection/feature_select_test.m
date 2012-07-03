@@ -15,7 +15,7 @@ num_test_cameras = length(test_cameras_id);
 num_test_images_per_camera = length(test_images_id);
 num_total_test_images = num_test_objects*num_test_cameras*num_test_images_per_camera;
 
-HIST_DIM = 10000;
+HIST_DIM = 1000;
 
 skip_processtest = 0;
 if exist('test_histogram.mat', 'file')
@@ -55,9 +55,9 @@ if ~skip_processtest
             end
         end
     end
+    test_histogram = test_histogram.*repmat(tdf, [1 size(test_histogram, 2) size(test_histogram, 3)]);
 end
 
-test_histogram = test_histogram.*repmat(tdf, [1 size(test_histogram, 2) size(test_histogram, 3)]);
 save test_histogram.mat test_histogram;
 
 % test_histogram is an D x N x C, where D := dimension of histogram
@@ -68,8 +68,8 @@ ground_truth = repmat(ground_truth, [1 num_test_images_per_camera*num_test_camer
 
 tic;
 disp('== Testing baseline...');
-[result_labels_bl class_acc_bl overall_acc_bl] = NN_1(test_histogram, train_histogram, ground_truth, 'l1');
-%[result_labels_bl class_acc_bl overall_acc_bl] = NS(test_histogram, train_histogram, ground_truth); % CRASHED HERE
+%[result_labels_bl class_acc_bl overall_acc_bl] = NN_1(test_histogram, train_histogram, ground_truth, 'l1');
+[result_labels_bl class_acc_bl overall_acc_bl] = NS(test_histogram, train_histogram, ground_truth); % CRASHED HERE
 fprintf('Baseline Overall Accuracy: %f\n', overall_acc_bl);
 time1 = toc;
 disp('');
@@ -81,7 +81,7 @@ train_histogram_sp = train_histogram(support_id, :, :);
 % support_sp = support(support_id, :);
 tic;
 disp('== Testing SPCA...');
-[result_labels_spca class_acc_spca overall_acc_spca] = NN_1(test_histogram_sp, train_histogram_sp, ground_truth, 'l1');
-%[result_labels_spca class_acc_spca overall_acc_spca] = NS(test_histogram_sp, train_histogram_sp, ground_truth);
+%[result_labels_spca class_acc_spca overall_acc_spca] = NN_1(test_histogram_sp, train_histogram_sp, ground_truth, 'l1');
+[result_labels_spca class_acc_spca overall_acc_spca] = NS(test_histogram_sp, train_histogram_sp, ground_truth);
 fprintf('SPCA Overall Accuracy: %f\n', overall_acc_spca);
 time2 = toc;

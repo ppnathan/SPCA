@@ -7,7 +7,7 @@ BMW_objects = {'bowles'; 'california'; 'campanile'; 'eastasianlibrary'; 'evans';
      'haas'; 'hearstgym'; 'hertzmorrison'; 'hilgard'; 'hmc'; 'logcabin'; 'mainlibrary'; 'musiclibrary'; ...
      'parkinglot'; 'sathergate'; 'sproul'; 'vlsb'; 'wurster'};
 
-HIST_DIM = 10000;
+HIST_DIM = 1000;
 
 %% run SPCA
 num_pc = 2;
